@@ -41,14 +41,10 @@ export const createUser = (req, res) => {
                 user:user.username,
                 age:user.age,
                 id: uuid()
-            };
+            })
+        console.log(`User [${user.username}] added to the database.`);
+        res.status(201).send("User " + user.username + " is created successfully");
     };
-);
-    
-    console.log(`User [${user.username}] added to the database.`);
-    res.status(201).send("User " + user.username + " is created with id:" + user.id)
-    
-
 };
 
 export const getUser = (req, res) => {
