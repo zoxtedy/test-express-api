@@ -10,41 +10,44 @@ export const getUsers = (req, res) => {
 
 export const createUser = (req, res) => {   
     const user = req.body;
+    let status;
     let message;
-    if ("age" in user){
+    datavalidation: if ("age" in user && "username" in user){
         if (user.age<17) {
-            console.log("User is too young.");
-            res.status(400).send("User is too young.");
-        }else if (user.age>70) {
-            console.log("User is too old.");
-            res.status(400).send("User is too old.");
+            status = 400;
+            message = message + "User is too young. ";
+			break datavalidation;
         };
-    }else {
-        res.status(400).send("User age is a required field.");
-    };
-    
-    if ("username" in user && user.username.length>0){
+		if (user.age>70) {
+            status = 400;
+            message = message + "User is too old. ";
+			break datavalidation;
+        };
         if(user.username.length>25){
-            console.log("Username is too long.");
-            res.status(400).send("Username is too long.");
-        };
-    }else{
-        res.status(400).send("Username is a required field.");
-    };
-            
-    if (users.length>10){
-        console.log("10 users max");
-        res.status(400).send("There can be maximum 10 users.");
-    }else{        
-        users.push(
+			status = 400;
+			message = message + "Username is too long.";
+			break datavalidation;
+        }; 
+        
+        if (users.length>10){
+        	status = 400;
+			message = "There can be maximum 10 users.";
+			break datavalidation;
+		};
+		users.push(
             {
                 user:user.username,
                 age:user.age,
                 id: uuid()
-            })
-        console.log(`User [${user.username}] added to the database.`);
-        res.status(201).send("User " + user.username + " is created successfully");
+            });
+		status =200;
+		message= "User " + user.username + " is created successfully";	
+	}else{
+        status = 400;
+        res.status(400).send("Username and age are required fields.");
     };
+    
+    res.status(status).send(message);
 };
 
 export const getUser = (req, res) => {
