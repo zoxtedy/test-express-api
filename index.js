@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 
 app.use("/people", usersRoutes);
 app.get("/", (req, res) => res.send("Welcome to the Users API!"));
-app.all("*", (req, res) =>res.send("You've tried reaching a route that doesn't exist."));
+app.all("*", (req, res) =>res.status(404).send("You've tried reaching a route that doesn't exist."));
 
 //.listen(process.env.PORT || 5000)
 
