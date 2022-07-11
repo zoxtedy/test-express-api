@@ -15,7 +15,7 @@ export const createUser = (req, res) => {
         if (user.age<17) {
             console.log("User is too young.");
             res.status(400).send("User is too young.");
-        }elseif (user.age>70) {
+        }else if (user.age>70) {
             console.log("User is too old.");
             res.status(400).send("User is too old.");
         }
