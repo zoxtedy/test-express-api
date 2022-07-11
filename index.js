@@ -9,7 +9,7 @@ const PORT = 5000;
 app.use(bodyParser.json());
 
 app.use("/users", usersRoutes);
-app.get("/", (req, res) => res.send("Welcome to the Users API!"));
+app.get("/", (req, res) => res.send("Welcome to the Users API! \n Endpoints: \n GET /users , \n POST /users, \n GET /users/:id"));
 app.all("*", (req, res) =>res.status(404).send("You've tried reaching a route that doesn't exist."));
 
 //.listen(process.env.PORT || 5000)
