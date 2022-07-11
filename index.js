@@ -14,4 +14,4 @@ app.all("*", (req, res) =>res.status(404).send("You've tried reaching a route th
 
 //.listen(process.env.PORT || 5000)
 
-app.listen(process.env.PORT || 5000); // adapted for heroku. Old line kept in this comment >>listen(PORT, () =>console.log(`Server running on port: http://localhost:${PORT}`));
+app.listen(process.env.PORT || 5000); // Adapted for heroku. Old line kept in this comment >>listen(PORT, () =>console.log(`Server running on port: http://localhost:${PORT}`));
