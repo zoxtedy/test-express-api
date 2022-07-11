@@ -23,7 +23,7 @@ export const createUser = (req, res) => {
             res.status(400).send("User age is a required field.");
     }
     
-    if ("username" in user && username.length>0){
+    if ("username" in user && user.username.length>0){
         if(user.username.length>25){
             console.log("Username is too long.");
             res.status(400).send("Username is too long.");
