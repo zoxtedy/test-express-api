@@ -56,7 +56,7 @@ export const updateUser =  (req,res) => {
             user.dob = req.body.role;
             user.dob = req.body.active;
 
-            res.status(200).send("User " + user.name + " is updated to role: " + user.role " and actiive set to " + user.active)
+            res.status(200).send("User " + user.name + " is updated to role: " + user.role + " and actiive set to " + user.active)
         }
     } catch (err) {
         res.status(400).send("Error trying to update the user")
