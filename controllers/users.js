@@ -1,53 +1,38 @@
+import moment from 'moment'
 import { v4 as uuid } from 'uuid';
 
 let users = [];
-
 export const getUsers = (req, res) => {
-    console.log(`Users in the database: ${users}`);
-
     res.send(users);
 }
 
 export const createUser = (req, res) => {   
     const user = req.body;
-    let status;
-    let message;
-    datavalidation: if ("age" in user && "username" in user){
-        if (user.age<17) {
-			status = 400;
-			message = "User is too young. ";
-			break datavalidation;
-        };
-		if (user.age>70) {
-            status = 400;
-            message = "User is too old. ";
-			break datavalidation;
-        };
-        if(user.username.length>25){
-			status = 400;
-			message = "Username is too long.";
-			break datavalidation;
-        }; 
-        
-        if (users.length>10){
-        	status = 400;
-		message = "There can be maximum 10 users.";
-			break datavalidation;
-		};
-		users.push(
-            {
-                user:user.username,
-                age:user.age,
-                id: uuid()
-            });
-		status =200;
-		message= "User " + user.username + " is created successfully";	
-	}else{
-        status = 400;
-        res.status(400).send("Username and age are required fields.");
-    };
-    
-    res.status(status).send(message);
+    if (!user.name) {
+        res.status(400).send("name is a required parameter");
+    } else if (user.name.length<3 && user.name.length>50) {
+        res.status(400).send("name should be between 3 and 50 characters");
+    } else if (!user.dob) {
+        res.status(400).send("Birthaday is a required parameter");
+    } else if (!moment(user.dob, "DD/MM/YYYY", true).isValid()) {
+        res.status(400).send("dob must be in format DD/MM/YYYY");
+    } else if (!["MANAGER", "WORKER", "SECURITY"].includes(user.role)) {
+        res.status(400).send("Invalid role: " + user.role);
+    } else if (!user.active) {
+        res.status(400).send("You can only create active users");
+    } else if (users.length>=10) {
+        res.status(400).send("Maximum nuber of users is 10!");
+    }else {
+        users.push({
+            name: user.name,
+            dob: user.dob,
+            role: user.role,
+            active: user.active,
+            id: uuid()
+        });
+
+        res.status(201).send(JSON.stringify(users[users.length - 1],null,2));
+    }
 };
 
 export const getUser = (req, res) => {
@@ -62,10 +47,18 @@ export const deleteUser = (req, res) => {
 };
 
 export const updateUser =  (req,res) => {
-    const user = users.find((user) => user.id === req.params.id);
-    
-    user.username = req.body.username;
-    user.age = req.body.age;
+    try {
+        const user = users.find((user) => user.id === req.params.id);
+         
+        if (!["MANAGER", "WORKER", "SECURITY"].includes(user.role)) {
+            res.status(400).send("Invalid role: " + user.role);
+        } else {
+            user.dob = req.body.role;
+            user.dob = req.body.active;
 
-    console.log(`username has been updated to ${req.body.username}.age has been updated to ${req.body.age}`)
+            res.status(200).send("User " + user.name + " is updated to role: " + user.role " and actiive set to " + user.active)
+        }
+    } catch (err) {
+        res.status(400).send("Error trying to update the user")
+    }
 };
