@@ -14,24 +14,24 @@ export const createUser = (req, res) => {
     let message;
     datavalidation: if ("age" in user && "username" in user){
         if (user.age<17) {
-            status = 400;
-            message = message + "User is too young. ";
+			status = 400;
+			message = "User is too young. ";
 			break datavalidation;
         };
 		if (user.age>70) {
             status = 400;
-            message = message + "User is too old. ";
+            message = "User is too old. ";
 			break datavalidation;
         };
         if(user.username.length>25){
 			status = 400;
-			message = message + "Username is too long.";
+			message = "Username is too long.";
 			break datavalidation;
         }; 
         
         if (users.length>10){
         	status = 400;
-			message = "There can be maximum 10 users.";
+		message = "There can be maximum 10 users.";
 			break datavalidation;
 		};
 		users.push(
