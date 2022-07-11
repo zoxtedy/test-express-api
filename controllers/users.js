@@ -18,27 +18,31 @@ export const createUser = (req, res) => {
         }else if (user.age>70) {
             console.log("User is too old.");
             res.status(400).send("User is too old.");
-        }
+        };
     }else {
-            res.status(400).send("User age is a required field.");
-    }
+        res.status(400).send("User age is a required field.");
+    };
     
     if ("username" in user && user.username.length>0){
         if(user.username.length>25){
             console.log("Username is too long.");
             res.status(400).send("Username is too long.");
-        }
+        };
     }else{
         res.status(400).send("Username is a required field.");
+    };
             
-
-        
-    users.push(
-        {
-            user.username,
-            user.age,
-            id: uuid()
-        }
+    if (users.length>10){
+        console.log("10 users max");
+        res.status(400).send("There can be maximum 10 users.");
+    }else{        
+        users.push(
+            {
+                user:user.username,
+                age:user.age,
+                id: uuid()
+            };
+    };
 );
     
     console.log(`User [${user.username}] added to the database.`);
