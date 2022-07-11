@@ -10,11 +10,40 @@ export const getUsers = (req, res) => {
 
 export const createUser = (req, res) => {   
     const user = req.body;
+    let message;
+    if ("age" in user){
+        if (user.age<17) {
+            console.log("User is too young.");
+            res.status(400).send("User is too young.");
+        }elseif (user.age>70) {
+            console.log("User is too old.");
+            res.status(400).send("User is too old.");
+        }
+    }else {
+            res.status(400).send("User age is a required field.");
+    }
+    
+    if ("username" in user && username.length>0){
+        if(user.username.length>25){
+            console.log("Username is too long.");
+            res.status(400).send("Username is too long.");
+        }
+    }else{
+        res.status(400).send("Username is a required field.");
+            
 
-    users.push({...user, id: uuid()});
+        
+    users.push(
+        {
+            user.username,
+            user.age,
+            id: uuid()
+        }
+);
     
     console.log(`User [${user.username}] added to the database.`);
-    res.status(201).send("User" + user.username + "is created")
+    res.status(201).send("User " + user.username + " is created with id:" + user.id)
+    
 
 };
 
