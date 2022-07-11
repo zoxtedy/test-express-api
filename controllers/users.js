@@ -14,6 +14,8 @@ export const createUser = (req, res) => {
     users.push({...user, id: uuid()});
     
     console.log(`User [${user.username}] added to the database.`);
+    res.status(201).send("User" + user.username + "is created")
+
 };
 
 export const getUser = (req, res) => {
@@ -24,6 +26,7 @@ export const deleteUser = (req, res) => {
     console.log(`user with id ${req.params.id} has been deleted`);
     
     users = users.filter((user) => user.id !== req.params.id);
+    res.status(204).send("User" + req.params.id + "is deleted")
 };
 
 export const updateUser =  (req,res) => {
