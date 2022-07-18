@@ -6,14 +6,13 @@ const { wakeDyno, wakeDynos } = require('heroku-keep-awake');
 import usersRoutes from "./routes/users.js";
 
 const PORT = 5000;
-const DYNO_URL = 'https://my-app.herokuapp.com';
+const DYNO_URL = 'https://neon-api-test-task.herokuapp.com'
 
 
 const app = express();
 
 
 app.use(bodyParser.json());
-const DYNO_URL = 'https://neon-api-test-task.herokuapp.com'
 
 const opts = {
     interval: 2,
