@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 
-const { wakeDyno, wakeDynos } = require('heroku-keep-awake');
+import wakeDyno from "heroku-keep-awake";
 
 import usersRoutes from "./routes/users.js";
 
