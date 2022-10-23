@@ -33,6 +33,7 @@ export const createUser = (req, res) => {
             id: uuid()
         });
 
+        res.type('json');
         res.status(201).send(JSON.stringify(users[users.length - 1],null,2));
     }
 };
