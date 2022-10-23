@@ -19,7 +19,7 @@ export const createUser = (req, res) => {
     } else if (user.dob > "11/11/2000") {
         res.status(400).send("dob must be in format DD/MM/YYYY");
     } else if (!["MANAGER", "WORKER", "SECURITY"].includes(user.role)) {
-        res.status(400).send("Invalid role: " + user.role);
+        res.status(500).send("Invalid role: " + user.role);
     } else if (!user.active) {
         res.status(400).send("You can only create active users");
     } else if (users.length>=10) {
