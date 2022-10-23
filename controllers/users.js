@@ -44,7 +44,7 @@ export const getUser = (req, res) => {
 export const deleteUser = (req, res) => { 
     console.log(`user with id ${req.params.id} has been deleted`);
     
-    console.log(users.findIndex((user) => user.id !== req.params.id));
+    console.log(users.find((user) => user.id === req.params.id));
     
     users = users.filter((user) => user.id !== req.params.id);
 
