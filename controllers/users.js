@@ -44,8 +44,6 @@ export const getUser = (req, res) => {
 export const deleteUser = (req, res) => { 
     try{
         console.log("user with id ${req.params.id} has been deleted");
-        let test = users.find((user) => user.id === req.params.id);
-        console.log(user);
         users = users.filter((user) => user.id !== req.params.id);
         res.status(204).send("User" + req.params.id + "is deleted")
     }catch (err) {
