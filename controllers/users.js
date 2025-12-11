@@ -1,70 +1,99 @@
-import moment from 'moment'
+import moment from 'moment';
 import { v4 as uuid } from 'uuid';
 
+const ROLES = ["MANAGER", "WORKER", "SECURITY"];
+const DOB_CUTOFF = moment("11/11/2000", "DD/MM/YYYY");
+
 let users = [];
+
+const findUserById = (id) => users.find((user) => user.id === id);
+
+const validateNewUser = (user) => {
+    if (!user?.name) return { status: 400, message: "name is a required parameter" };
+    if (user.name.length < 3 || user.name.length > 50) {
+        return { status: 400, message: "name should be between 3 and 50 characters" };
+    }
+
+    if (!user.dob) return { status: 400, message: "Birthday is a required parameter" };
+    const dob = moment(user.dob, "DD/MM/YYYY", true);
+    if (!dob.isValid()) return { status: 400, message: "dob must be in format DD/MM/YYYY" };
+    if (dob.isAfter(DOB_CUTOFF)) {
+        return { status: 400, message: "dob must be on or before 11/11/2000" };
+    }
+
+    if (!ROLES.includes(user.role)) return { status: 400, message: `Invalid role: ${user.role}` };
+    if (typeof user.active !== "boolean") return { status: 400, message: "active must be a boolean" };
+    if (users.length >= 10) return { status: 400, message: "Maximum number of users is 10!" };
+
+    return { status: 201, dob };
+};
+
+const validateRoleAndActive = (payload) => {
+    if (payload.role !== undefined && !ROLES.includes(payload.role)) {
+        return { status: 400, message: `Invalid role: ${payload.role}` };
+    }
+    if (payload.active !== undefined && typeof payload.active !== "boolean") {
+        return { status: 400, message: "active must be a boolean" };
+    }
+    return null;
+};
+
 export const getUsers = (req, res) => {
     res.send(users);
-}
+};
 
-export const createUser = (req, res) => {   
-    const user = req.body;
-    if (!user.name) {
-        res.status(400).send("name is a required parameter");
-    } else if (user.name.length<3 && user.name.length>50) {
-        res.status(400).send("name should be between 3 and 50 characters");
-    } else if (!user.dob) {
-        res.status(400).send("Birthaday is a required parameter");
-    } else if (!moment(user.dob, "DD/MM/YYYY", true).isValid()) {
-        res.status(400).send("dob must be in format DD/MM/YYYY");
-    } else if (user.dob > "11/11/2000") {
-        res.status(400).send("dob must be in format DD/MM/YYYY");
-    } else if (!["MANAGER", "WORKER", "SECURITY"].includes(user.role)) {
-        res.status(500).send("Invalid role: " + user.role);
-    } else if (!user.active) {
-        res.status(400).send("You can only create active users");
-    } else if (users.length>=10) {
-        res.status(400).send("Maximum nuber of users is 10!");
-    }else {
-        users.push({
-            name: user.name,
-            dob: user.dob,
-            role: user.role,
-            active: user.active,
-            id: uuid()
-        });
+export const createUser = (req, res) => {
+    const validation = validateNewUser(req.body);
+    if (validation.status !== 201) return res.status(validation.status).send(validation.message);
 
-        res.type('json');
-        res.status(201).send(JSON.stringify(users[users.length - 1],null,2));
-    }
+    const userToSave = {
+        name: req.body.name,
+        dob: validation.dob.format("DD/MM/YYYY"),
+        role: req.body.role,
+        active: req.body.active,
+        id: uuid()
+    };
+
+    users.push(userToSave);
+
+    res.type("json");
+    return res.status(201).send(JSON.stringify(userToSave, null, 2));
 };
 
 export const getUser = (req, res) => {
-    res.send(req.params.id)
+    const user = findUserById(req.params.id);
+    if (!user) return res.status(404).send("User not found");
+    return res.json(user);
 };
 
-export const deleteUser = (req, res) => { 
-    try{
-        console.log("user with id ${req.params.id} has been deleted");
-        users = users.filter((user) => user.id !== req.params.id);
-        res.status(204).send("User" + req.params.id + "is deleted")
-    }catch (err) {
-        res.status(500).send("Error trying to delete the user")
+export const deleteUser = (req, res) => {
+    try {
+        const user = findUserById(req.params.id);
+        if (!user) return res.status(404).send("User not found");
+
+        console.log(`user with id ${req.params.id} has been deleted`);
+        users = users.filter((u) => u.id !== req.params.id);
+        return res.sendStatus(204);
+    } catch (err) {
+        return res.status(500).send("Error trying to delete the user");
     }
 };
 
-export const updateUser =  (req,res) => {
+export const updateUser = (req, res) => {
     try {
-        const user = users.find((user) => user.id === req.params.id);
-         
-        if (!["MANAGER", "WORKER", "SECURITY"].includes(user.role)) {
-            res.status(400).send("Invalid role: " + user.role);
-        } else {
-            user.dob = req.body.role;
-            user.dob = req.body.active;
+        const user = findUserById(req.params.id);
+        if (!user) return res.status(404).send("User not found");
 
-            res.status(200).send("User " + user.name + " is updated to role: " + user.role + " and actiive set to " + user.active)
-        }
+        const validationError = validateRoleAndActive(req.body);
+        if (validationError) return res.status(validationError.status).send(validationError.message);
+
+        if (req.body.role !== undefined) user.role = req.body.role;
+        if (req.body.active !== undefined) user.active = req.body.active;
+
+        return res
+            .status(200)
+            .send(`User ${user.name} updated to role: ${user.role} and active set to ${user.active}`);
     } catch (err) {
-        res.status(400).send("Error trying to update the user")
+        return res.status(400).send("Error trying to update the user");
     }
 };
