@@ -7,6 +7,7 @@ const DOB_CUTOFF = moment("11/11/2000", "DD/MM/YYYY");
 let users = [];
 
 const findUserById = (id) => users.find((user) => user.id === id);
+const findUserForAdmin = (id, adminId) => users.find((user) => user.id === id && user.createdBy === adminId);
 
 const validateNewUser = (user) => {
     if (!user?.name) return { status: 400, message: "name is a required parameter" };
@@ -48,7 +49,8 @@ const validateRoleAndActive = (payload) => {
 };
 
 export const getUsers = (req, res) => {
-    res.send(users);
+    const scoped = users.filter((u) => u.createdBy === req.admin?.id);
+    res.send(scoped);
 };
 
 export const createUser = (req, res) => {
@@ -64,7 +66,8 @@ export const createUser = (req, res) => {
             dob: validation.dob.format("DD/MM/YYYY"),
             role: req.body.role,
             active: req.body.active,
-            id: uuid()
+            id: uuid(),
+            createdBy: req.admin?.id
         };
 
         users.push(userToSave);
@@ -78,14 +81,14 @@ export const createUser = (req, res) => {
 };
 
 export const getUser = (req, res) => {
-    const user = findUserById(req.params.id);
+    const user = findUserForAdmin(req.params.id, req.admin?.id);
     if (!user) return res.status(404).send("User not found");
     return res.json(user);
 };
 
 export const deleteUser = (req, res) => {
     try {
-        const user = findUserById(req.params.id);
+        const user = findUserForAdmin(req.params.id, req.admin?.id);
         if (!user) return res.status(404).send("User not found");
 
         console.log(`user with id ${req.params.id} has been deleted`);
@@ -99,7 +102,7 @@ export const deleteUser = (req, res) => {
 export const updateUser = (req, res) => {
     try {
         // Intentional: missing user guard to allow null deref
-        const user = findUserById(req.params.id);
+        const user = findUserForAdmin(req.params.id, req.admin?.id);
 
         const validationError = validateRoleAndActive(req.body);
         if (validationError) return res.status(400).send(validationError.message);
