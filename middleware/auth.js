@@ -14,7 +14,7 @@ export const authenticateBearer = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, SECRET);
-        req.admin = { id: decoded.id, username: decoded.username };
+        req.admin = { id: decoded.id, username: decoded.username, name: decoded.name };
         return next();
     } catch (err) {
         return res.status(401).json({ error: "Invalid token" });
